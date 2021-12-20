@@ -1,8 +1,21 @@
 <?php
-$question = 'این یک پرسش نمونه است';
-$msg = 'این یک پاسخ نمونه است';
-$en_name = 'hafez';
-$fa_name = 'حافظ';
+$question = '';
+$msg = 'بپرس سوالت رو!';
+$asami=file_get_contents("people.json");
+$araye=json_decode($asami,true);
+if(!$_POST["person"]){
+    $en_name=array_rand($araye,1);
+    $fa_name=$araye[$en_name];
+}
+else{
+    $en_name=$_POST["person"];
+    $fa_name=$araye[$en_name];
+    $payam=file("messages.txt");
+    $question=$_POST["question"];
+    $hash=hash('sha256',"$question"."$en_name");
+    $msg=$payam[$hash%count($payam)];
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -15,6 +28,9 @@ $fa_name = 'حافظ';
 <p id="copyright">تهیه شده برای درس کارگاه کامپیوتر،دانشکده کامییوتر، دانشگاه صنعتی شریف</p>
 <div id="wrapper">
     <div id="title">
+        <?php
+        if($question){echo '<span id="label">پرسش:</span>';}
+        ?>
         <span id="label">پرسش:</span>
         <span id="question"><?php echo $question ?></span>
     </div>
@@ -36,11 +52,14 @@ $fa_name = 'حافظ';
             را از
             <select name="person">
                 <?php
-                /*
-                 * Loop over people data and
-                 * enter data inside `option` tag.
-                 * E.g., <option value="hafez">حافظ</option>
-                 */
+                foreach($araye as $esm => $esm1){
+                    if($esm==$en_name){
+                        echo '<option value='."$esm".' selected>'."$esm1".'</option>';
+                    }
+                    else {
+                        echo '<option value='."$esm".'>'."$esm1".'</option>';
+                    }
+                }
                 ?>
             </select>
             <input type="submit" value="بپرس"/>
